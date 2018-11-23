@@ -29,14 +29,17 @@ for topic in app_flask.config['CONSUMERTOPIC']:
     app_flask.QueueGet[topic] = Queue()
 
 # 开启kafka进程
-app_flask.kafka = KafkaProcess(hosts=app_flask.config['KAFKAHOST'],
+kafka = KafkaProcess(hosts=app_flask.config['KAFKAHOST'],
                                logger=None,
                                topic_send=app_flask.config['PRODUCERTOPIC'],
                                topic_get=app_flask.config['CONSUMERTOPIC'])
-p_kafka = Process(target=app_flask.kafka.doWork, args=(app_flask.QueueSend, app_flask.QueueGet))
+p_kafka = Process(target=kafka.doWork,
+                  args=(app_flask.QueueSend, app_flask.QueueGet))
 
 
 if __name__ == '__main__':
     p_kafka.start()
-    socketio.run(app_flask, host=app_flask.config['HOST'], port=app_flask.config['PORT'],
+    socketio.run(app_flask,
+                 host=app_flask.config['HOST'],
+                 port=app_flask.config['PORT'],
                  debug=app_flask.config['DEBUG'])
