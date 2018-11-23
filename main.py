@@ -30,9 +30,8 @@ for topic in app_flask.config['CONSUMERTOPIC']:
 
 # 开启kafka进程
 kafka = KafkaProcess(hosts=app_flask.config['KAFKAHOST'],
-                               logger=None,
-                               topic_send=app_flask.config['PRODUCERTOPIC'],
-                               topic_get=app_flask.config['CONSUMERTOPIC'])
+                     topic_send=app_flask.config['PRODUCERTOPIC'],
+                     topic_get=app_flask.config['CONSUMERTOPIC'])
 p_kafka = Process(target=kafka.doWork,
                   args=(app_flask.QueueSend, app_flask.QueueGet))
 
