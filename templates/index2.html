@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket测试客户端</title>
+    <link href="{{ url_for('static', filename='js/layui/css/layui.css') }}" type="text/css">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/layui/layui.js') }}"></script>
+</head>
+<body>
+<blockquote class="layui-elem-quote">Kafka测试2</blockquote>
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-col-md9">
+            <input type="text" name="url" id="url" value="http://192.168.100.69:8000/kfkcon2">
+        </div>
+        <div class="layui-col-md3">
+            <button id="connect">连接</button> <button id="disconnect">断开</button>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <textarea cols="100" rows="7" id="content"></textarea>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md9">
+            <input type="text" name="word" id="word" value='{"action":"resp", "data":{"msg":"ok"}}'>
+        </div>
+        <div class="layui-col-md3">
+            <button id="send">发送</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" charset="utf-8">
+    layui.use(['layer'], function(){
+        var layer = layui.layer,
+            $ = layui.$;
+        var socket = null;
+        function addMsg(msg){
+            sold = $('#content').val();
+            snew = msg+'\n'+sold;
+            $('#content').val(snew);
+        }
+        $('#connect').on('click', function(){
+            if (socket != null) {
+                socket.open();
+            }
+            else{
+                socket = io($('#url').val());
+                socket.on('connect', function () {
+                    addMsg('连接成功')
+                });
+                socket.on('response', function (data) {
+                    addMsg('服务器反馈：' + data);
+                });
+                socket.on('message', function (data){
+                    addMsg('信息：'+data);
+                });
+            }
+        });
+        $('#disconnect').on('click', function(){
+            socket.close();
+        });
+        $('#send').on('click', function(){
+            if(socket.connected) {
+                word = $('#word').val();
+                addMsg('命令：' + word);
+                socket.emit('order', {order: word});
+            }else{
+                alert('未链接');
+            }
+        });
+    });
+
+</script>
+</body>
+</html>
